@@ -1,0 +1,2 @@
+import m from 'mithril'
+m.mount(document.body, {view: () => "HELLO WORLD X"});
