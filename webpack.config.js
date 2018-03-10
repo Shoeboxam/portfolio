@@ -5,5 +5,13 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, './portfolio/portfolio/static'),
         filename: 'app.bundle.js'
+    },
+    module: {
+        rules: [
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader']
+            }
+        ]
     }
 };
