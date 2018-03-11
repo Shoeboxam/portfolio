@@ -3,5 +3,6 @@ node_modules/
 __pycache__/
 *.pyc
 /portfolio/portfolio/static/*
-secret.txt
+/portfolio/portfolio/config.json
 nohup.out
+static/*

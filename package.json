@@ -7,7 +7,7 @@
     "doc": "doc"
   },
   "scripts": {
-    "build": "webpack -p",
+    "build": "webpack -p --config ./webpack.config.js/",
     "start": "webpack -d --watch"
   },
   "repository": {

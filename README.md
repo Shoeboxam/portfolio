@@ -33,3 +33,12 @@ Start webpack
 workon portfolio
 npm start
 ```
+
+### Deploy production
+Run from the git root:
+```
+git pull && rm -r static/ && npm run build && python3 portfolio/manage.py collectstatic && sudo service apache2 restart
+```
+
+Apache config
+/etc/apache2/sites-available/Django.conf

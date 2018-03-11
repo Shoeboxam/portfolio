@@ -3,6 +3,10 @@ from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.encoding import force_bytes
 
+import json
+
+from subprocess import run
+
 import requests
 from ipaddress import ip_address, ip_network
 
@@ -18,7 +22,7 @@ def index(request):
 
 @csrf_exempt
 def update(request):
-    key = open('secret.txt', 'r').readline()[:-1]
+    key = json.load(open('config.json', 'r'))['django_secret']
 
     header = request.META.get('HTTP_X_FORWARDED_FOR')
     if not header:
@@ -44,5 +48,13 @@ def update(request):
 
     mac = hmac.new(force_bytes(key), msg=force_bytes(request.body), digestmod=sha1)
     if not hmac.compare_digest(force_bytes(mac.hexdigest()), force_bytes(signature)):
-        return HttpResponseForbidden('Permission denied. Invalid secret.')
-    return HttpResponse("pass")
+        return HttpResponseForbidden('Permission denied.')
+
+    run(("cd ../ && " +
+         "rm -r static/ && " +
+         "npm run build && " +
+         "python3 portfolio/manage.py collectstatic && " +
+         "apachectl -k restart && " +
+         "cd portfolio/").split(' '))
+
+    return HttpResponse("success")
