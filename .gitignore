@@ -1,5 +1,7 @@
 node_modules/
 .idea/
-**/__pycache__/
+__pycache__/
 *.pyc
 /portfolio/portfolio/static/*
+secret.txt
+nohup.out

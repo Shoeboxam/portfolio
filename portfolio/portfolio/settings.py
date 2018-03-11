@@ -25,7 +25,7 @@ SECRET_KEY = '0(_f29s%&mzo&p&e!mchdrzp$owa@@@5-5s3fo86ivtoa77uq6'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["159.65.229.146", "localhost", "127.0.0.1", "shoemate.net"]
 
 
 # Application definition

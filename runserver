@@ -1,2 +1,2 @@
 #!/bin/bash
-exec ./portfolio/manage.py runserver 0.0.0.0:8001
+exec python3 ./portfolio/manage.py runserver 0.0.0.0:80
