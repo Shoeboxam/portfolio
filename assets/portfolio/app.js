@@ -6,15 +6,19 @@ export let colAccentDark = '#111d4a';
 
 export let projects = [
     {
-        title: 'project 1',
+        id: 'Autodiff',
+        name: 'Automatic Differentiator',
         description: 'description'
     },
     {
-        title: 'project 2',
+        id: 'p2',
+        name: 'project 2',
         description: 'description'
     },
     {
-        title: 'project 3',
+        id: 'p3',
+        name: 'project 3',
         description: 'description'
     }
 ];
+

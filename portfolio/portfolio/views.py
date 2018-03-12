@@ -13,10 +13,11 @@ from ipaddress import ip_address, ip_network
 import hmac
 from hashlib import sha1
 
-def index(request):
+def index(request, url='root'):
     template = loader.get_template('index.html')
+    print(url);
     context = {
-        'content': 'Hello World!',
+        'url': url,
     }
     return HttpResponse(template.render(context, request))
 
