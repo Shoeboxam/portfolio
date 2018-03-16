@@ -1,17 +1,72 @@
 body, html {
+    color: #555;
     margin: 0;
-}
-* {
-    font-family: "Helvetica Neue", Arial, Verdana, sans-serif;
+    display: flex;
+    height: 100%;
+    width: 100%;
 }
 
 .card {
-    /* Add shadows to create the "card" effect */
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.3);
     transition: 0.3s;
+    border: 1px solid rgba(0,0,0,0.08);
 }
 
- /*On mouse-over, add a deeper shadow*/
 .card:hover {
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 2px 6px 0 rgba(0,0,0,0.4);
+}
+
+#menu {
+    height: 100%;
+    align-self: flex-start;
+    z-index: 1000;
+    background: #1e1e24;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+#canvas {
+    flex-grow: 1;
+    overflow: hidden;
+    line-height: 1.6em;
+    overflow-y: auto;
+}
+
+#content {
+    max-width: 80em;
+    margin:auto;
+}
+
+#menu .pure-menu li a {
+    color: #aaa;
+}
+
+#menu .pure-menu li a:hover,
+#menu .pure-menu li a:focus {
+    background: rgba(255, 255, 255, 0.125);
+}
+
+#menu .pure-menu-selected,
+#menu .pure-menu-heading {
+    background: #3E7D9B;
+}
+
+#menu .pure-menu-selected a {
+    color: #fff;
+}
+
+#menu .pure-menu-heading {
+    font-size: 110%;
+    color: #fff;
+}
+
+@media (max-width: 1000px) {
+    #canvas {
+        padding-left: 2em;
+        padding-right: 2em;
+    }
+
+    #menu {
+        display: none;
+    }
 }

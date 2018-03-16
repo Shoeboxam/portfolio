@@ -21,7 +21,8 @@
   },
   "homepage": "https://github.com/Shoeboxam/portfolio#readme",
   "dependencies": {
-    "mithril": "^1.1.6"
+    "mithril": "^1.1.6",
+    "purecss": "^1.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

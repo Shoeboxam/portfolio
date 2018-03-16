@@ -1,7 +1,7 @@
+import '../../node_modules/purecss/build/pure-min.css'
 import m from 'mithril'
 import "./index.css"
 import Card from './views/Card'
-import Sidebar from './views/Sidebar'
 
 import svgBox from './images/box.svg'
 
@@ -14,76 +14,30 @@ let icon = (name, callback) => m(`span#icon${name}`, {
 }, m(`img#box`, {src: svgBox, width: '44px', height: '44px'}));
 
 class Body {
-    header() {
-        return m('div#header', {
-            style: {
-                height: '200px',
-                width: '100%',
-                background: app.colGray
-            }
-        })
-    }
 
     view(vnode) {
-        // console.log(vnode.attrs.project);
-        let sidebarWidth = '50px';
-        return m('div#home', {
-            style: {height: '100vh'}
-        }, [
-            m(Sidebar, {
-                width: sidebarWidth,
-                contents: [
-                    m('div', {style: {height: '50px'}}),
-                    ...app.projects.map((project) => icon(project['id'], () => m.route.set('/' + project['id'])))
-                ]
-            }),
-            m('div#canvas', {
-                    style: {
-                        height: '100%',
-                        width: `calc(100% - ${sidebarWidth})`,
-                        background: app.colBackground,
-                        'margin-left': sidebarWidth,
-                        'overflow-x': 'hidden',
-                        'overflow-y': 'auto'
-                    }
-                }, [
-                    this.header(vnode.attrs),
-                    app.projects.map((project) => m(Card, project))
-                ]
-            )
-        ])
-    }
-}
+        // let {projectName} = vnode.attrs;
 
-class Autodiff {
-    view(vnode) {
-        let sidebarWidth = '50px';
-        return m('div#home', {
-            style: {height: '100vh'}
-        },  [
-            m(Sidebar, {
-                width: sidebarWidth,
-                contents: icon('home', () => m.route.set('/'))
-            }),
-            m('div#canvas', {
-                    style: {
-                        height: '100%',
-                        width: `calc(100% - ${sidebarWidth})`,
-                        background: app.colBackground,
-                        'margin-left': sidebarWidth,
-                        'overflow-x': 'hidden',
-                        'overflow-y': 'auto'
-                    }
-                }
+        return [
+            m('a.menu-link', {href: '#menu'}, m('span')),
+            m('div#menu',
+                m('div.pure-menu', {display: 'inline-block'}, [
+                    m('span.pure-menu-heading', 'Michael Shoemate'),
+                    m('ul.pure-menu-list', [
+                        app.projects.map((project) => m('li.pure-menu-item', m('a.pure-menu-link', project.name)))
+                    ])
+                ])
+            ),
+            m('div#canvas',
+                m('div#content', app.projects.map((project) => m(Card, project)))
             )
-        ])
+        ]
     }
 }
 
 m.route.prefix("");
 m.route(document.body, "/", {
     "/": Body,
-    "/Autodiff": Autodiff,
     "/:project": Body
 });
 
