@@ -33,8 +33,9 @@ body, html {
 }
 
 #content {
+    padding: 0 2em;
+    margin: 0 auto;
     max-width: 80em;
-    margin:auto;
 }
 
 #menu .pure-menu li a {

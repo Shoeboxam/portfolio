@@ -24,7 +24,7 @@ class Body {
                 m('div.pure-menu', {display: 'inline-block'}, [
                     m('span.pure-menu-heading', 'Michael Shoemate'),
                     m('ul.pure-menu-list', [
-                        app.projects.map((project) => m('li.pure-menu-item', m('a.pure-menu-link', project.name)))
+                        app.projects.map((project) => m('li.pure-menu-item', m('a.pure-menu-link', {href: '#' + project.id}, project.name)))
                     ])
                 ])
             ),
