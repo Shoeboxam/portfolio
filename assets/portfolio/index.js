@@ -3,28 +3,25 @@ import m from 'mithril'
 import "./index.css"
 import Card from './views/Card'
 
-import svgBox from './images/box.svg'
 
 import * as app from './app'
 
-
-let icon = (name, callback) => m(`span#icon${name}`, {
-    onclick: callback,
-    style: {width: '100%', float: 'left', margin: '0 3px'}
-}, m(`img#box`, {src: svgBox, width: '44px', height: '44px'}));
-
 class Body {
+    oncreate(vnode) {
+        let {project} = vnode.attrs;
+        if (project) selectProject(project);
+    }
 
     view(vnode) {
         // let {projectName} = vnode.attrs;
-
         return [
             m('a.menu-link', {href: '#menu'}, m('span')),
             m('div#menu',
                 m('div.pure-menu', {display: 'inline-block'}, [
                     m('span.pure-menu-heading', 'Michael Shoemate'),
                     m('ul.pure-menu-list', [
-                        app.projects.map((project) => m('li.pure-menu-item', m('a.pure-menu-link', {href: '#' + project.id}, project.name)))
+                        app.projects.map((project) => m('li.pure-menu-item',
+                            m('a.pure-menu-link', {onclick: () => selectProject(project.id)}, project.name)))
                     ])
                 ])
             ),
@@ -35,10 +32,17 @@ class Body {
     }
 }
 
+
+export let selectProject = (project) => {
+    if (app.projects.map((desc) => desc.id).indexOf(project) === -1) { m.route.set('/'); return; }
+
+    document.getElementById('card' + project).scrollIntoView();
+    document.getElementById('canvas').scrollTop -= 10;
+    m.route.set("/" + project);
+};
+
 m.route.prefix("");
 m.route(document.body, "/", {
     "/": Body,
     "/:project": Body
 });
-
-// m.mount(document.body, Body);

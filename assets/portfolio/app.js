@@ -1,3 +1,5 @@
+import m from "mithril";
+
 export let colBackground = '#f2f3ec';
 export let colGray = '#EDEDF0';
 export let colGray2 = '#CACAD3';
@@ -9,7 +11,7 @@ export let colAccentLight = '#A8CBDC';
 
 export let projects = [
     {
-        id: 'NeuralNetworkLibrary',
+        id: 'Neural_Network_Library',
         name: 'Neural Network Library',
         description:
             'This is an independent implementation of a feedforward neural network without the use of popular differentiation libraries, such as Tensorflow or PyTorch. ' +
@@ -39,7 +41,7 @@ export let projects = [
         ]
     },
     {
-        id: 'Autodiff',
+        id: 'Automatic_Differentiator',
         name: 'Automatic Differentiator',
         description:
             `The automatic differentiator is an alternative implementation of the Neural Network Library via 'propagation of gradients.' ` +
@@ -111,7 +113,7 @@ export let projects = [
         ]
     },
     {
-        id: 'TextureSynthesis',
+        id: 'Texture_Synthesis',
         name: 'Texture Synthesis',
         description:
             'This project is difficult to explain, but I made it to address an issue I saw with Minecraft retexturing for modifications to Minecraft. ' +
@@ -136,7 +138,7 @@ export let projects = [
         ]
     },
     {
-        id: 'CellularAutomata',
+        id: 'Cellular_Automata',
         name: 'Cellular Automata',
         description:
             'The program is just a simple interactive display of elementary cellular automata. It makes use of SDL for rendering and viewport manipulation.',
@@ -148,5 +150,3 @@ export let projects = [
         ]
     }
 ];
-
-export let activeProject = '';
