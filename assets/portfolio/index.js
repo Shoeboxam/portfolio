@@ -5,15 +5,15 @@ import Card from './views/Card'
 
 
 import * as app from './app'
+import * as sim from './simulator'
 
-class Body {
+class Home {
     oncreate(vnode) {
         let {project} = vnode.attrs;
         if (project) selectProject(project);
     }
 
     view(vnode) {
-        // let {projectName} = vnode.attrs;
         return [
             m('a.menu-link', {href: '#menu'}, m('span')),
             m('div#menu',
@@ -32,7 +32,6 @@ class Body {
     }
 }
 
-
 export let selectProject = (project) => {
     if (app.projects.map((desc) => desc.id).indexOf(project) === -1) { m.route.set('/'); return; }
 
@@ -41,8 +40,30 @@ export let selectProject = (project) => {
     m.route.set("/" + project);
 };
 
+class Simulator {
+
+    view(vnode) {
+        return [
+            m('a.menu-link', {href: '#menu'}, m('span')),
+            m('div#menu',
+                m('div.pure-menu', {display: 'inline-block'}, [
+                    m('span.pure-menu-heading', 'Michael Shoemate'),
+                    m('ul.pure-menu-list', [
+                        Object.keys(sim.validHyperparameters).map((param) => m('li.pure-menu-item',
+                            m('a.pure-menu-link', param)))
+                    ])
+                ])
+            ),
+            m('div#canvas',
+                m('div#content', sim.views.map((project) => m(Card, project)))
+            )
+        ]
+    }
+}
+
 m.route.prefix("");
 m.route(document.body, "/", {
-    "/": Body,
-    "/:project": Body
+    "/": Home,
+    "/simulator": Simulator,
+    "/:project": Home
 });

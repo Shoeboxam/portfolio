@@ -31,8 +31,8 @@ export let projects = [
                 url: 'https://github.com/Shoeboxam/Neural_Network'
             },
             {
-                name: 'Visualization',
-                url: 'http://shoemate.net/Autodiff/Demo'
+                name: 'Simulator',
+                url: 'http://shoemate.net/Simulator'
             },
             {
                 name: 'Explanation',
