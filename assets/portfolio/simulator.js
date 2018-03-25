@@ -1,27 +1,47 @@
-export let views = [
-    {
-        id: 'ProblemSelect',
-        name: 'Select a problem',
-        description:
-            'Vector function: Fit a vector function.<br>' +
-            'Logic Gate: Emulate a logic gate. XOR is widely used as an example of a non-linearly separable problem.<br>' +
-            'Autoencoder: Denoise a figlet font.<br>',
-        links: []
-    },
-    {
-        id: 'NetworkSelect',
-        name: 'Customize the network',
-        description: 'SETTINGS',
-        links: []
-    },
-    {
-        id: 'ProblemView',
-        name: 'View training updates',
-        description: 'PLOTS',
-        links: []
-    }
-];
+import m from 'mithril'
 
+let getNetwork = () => {
+    let menu = layers.map((layer, i) => [
+        m('label', {for: 'layer' + i}, 'Layer ' + i),
+        m('select#layer' + i, {
+                value: layer['transform'],
+                onchange: m.withAttr('value', (value) => setLayer(i, 'transform', value))
+            },
+            networkRange['basis'].map((transform) => m('option', transform))),
+        m('input#layer' + i, {type: 'text', onblur: m.withAttr('value', (value) => setLayer(i, 'nodes', value))})
+    ]);
+
+    if (menu.length < 10) {
+        menu.push([
+            m('label', {for: 'newLayer'}, 'New'),
+            m('select#newLayer', {
+                    value: 'Select Basis',
+                    onchange: m.withAttr('value', (value) => addLayer(layers.length, 'transform', value))
+                },
+                networkRange['basis'].map((transform) => m('option', transform))),
+            m('input#newLayer', {type: 'text'})
+        ])
+    }
+    return menu;
+};
+
+
+let getSettings = () => Object.keys(optimizerType).map((setting) => {
+    let interaction;
+
+    if (optimizerType[setting] === 'dropdown') interaction = m(`select#dropdown${setting}`, {
+            value: 'Select Basis',
+            onchange: m.withAttr('value', (value) => setUserHyperparameter(setting, value))
+        },
+        optimizerRange[setting].map((option) => m('option', option)));
+
+    else interaction = m('input#input' + setting.replace(/ /g, "_"), {
+            type: 'text',
+            onblur: m.withAttr('value', (value) => setUserHyperparameter(setting, value))
+        });
+
+    return [m(`#label${setting.replace(/ /g, "_")}`, setting), interaction]
+});
 
 export let problem = '';
 export let setProblem = (prob) => problem = prob;
@@ -32,17 +52,8 @@ export let addLayer = (layer, field, value) => layers.push({[field]: value});
 export let setLayer = (layer, field, value) => layers[layer][field] = value;
 export let delLayer = (layer) => layers.splice(layer);
 
-export let shiftLayer = (layer, promote) => {
-    let offset = promote ? 1 : -1;
-
-    let temp = layers[layer];
-    layers[layer] = layers[layer + offset];
-    layers[layer + offset] = temp;
-};
-
-
-export let validHyperparameters = {
-    // network parameters
+// network parameters
+export let networkRange = {
     'units': [1, 200],
     'layers': [1, 10],
     'basis': [
@@ -50,8 +61,11 @@ export let validHyperparameters = {
         'tanh', 'arctan', 'sinusoid', 'sinc', 'softsign', 'bent', 'log'
     ],
     'distribute': ['normal', 'uniform'],
+};
 
-    // optimizer parameters
+
+// optimizer parameters
+export let optimizerRange = {
     'optimizer': [
         'GradientDescent', 'Momentum', 'Nesterov', 'Adagrad',
         'RMSprop', 'Adam', 'Adamax', 'Nadam', 'Quickprop'
@@ -86,6 +100,49 @@ export let validHyperparameters = {
     'noise variance': [0, 100],
     'noise anneal': ['fixed', 'linear', 'inverse', 'power', 'exp'],
     'noise decay': [-100, 100]
+};
+
+// network parameters
+export let networkType = {
+    'units': 'integer',
+    'layers': 'integer',
+    'basis': 'dropdown',
+    'distribute': 'dropdown'
+};
+
+// optimizer parameters
+export let optimizerType = {
+    'optimizer': 'dropdown',
+    'iteration limit': 'integer',
+
+    'cost': 'dropdown',
+    'batch size': 'integer',
+
+    'learn step': 'real',
+    'learn anneal': 'dropdown',
+    'learn decay': 'real',
+
+    'normalize': 'dropdown',
+    'normalize decay': 'real',
+
+    'batch norm step': 'real',
+    'batch norm decay': 'real',
+
+    'regularize step': 'real',
+    'regularizer': 'dropdown',
+
+    'dropout step': 'real',
+    'dropconnect step': 'real',
+
+    'weight clip': 'dropdown',
+    'weight threshold': 'real',
+
+    'gradient clip': 'dropdown',
+    'gradient threshold': 'real',
+
+    'noise variance': 'real',
+    'noise anneal': 'dropdown',
+    'noise decay': 'real'
 };
 
 export let defaultHyperparameters = {
@@ -129,3 +186,36 @@ export let defaultHyperparameters = {
         'debug frequency': 10
     }
 };
+
+let userHyperparameters = {};
+let setUserHyperparameter = (setting, preference) => userHyperparameters[setting] = preference;
+
+export let views = [
+    {
+        id: 'Problem',
+        name: 'Problem',
+        description:
+        'Vector function: Fit a vector function.<br>' +
+        'Logic Gate: Emulate a logic gate. XOR is widely used as an example of a non-linearly separable problem.<br>' +
+        'Autoencoder: Denoise a figlet font.<br>',
+        links: []
+    },
+    {
+        id: 'Network',
+        name: 'Network',
+        description: m('#settingsForm.pure-form.pure-form-aligned', m('fieldset', getNetwork())),
+        links: []
+    },
+    {
+        id: 'Optimizer',
+        name: 'Optimizer',
+        description: m('#settingsForm.pure-form.pure-form-aligned', m('fieldset', getSettings())),
+        links: []
+    },
+    {
+        id: 'View',
+        name: 'View',
+        description: 'PLOTS',
+        links: []
+    }
+];

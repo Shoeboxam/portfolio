@@ -4,7 +4,7 @@ import '../../node_modules/icono/build/icono.css'
 import m from 'mithril'
 import "./index.css"
 import Card from './views/Card'
-
+import Layout from './views/Layout'
 
 import * as app from './app'
 import * as sim from './simulator'
@@ -12,72 +12,56 @@ import * as sim from './simulator'
 class Home {
     oncreate(vnode) {
         let {project} = vnode.attrs;
-        if (project) selectProject(project);
+        if (project) selectCard(project);
     }
 
     view(vnode) {
-        return [
-            m('a#menuTab.menu-link', {onclick: app.toggleMobileMenu}, m('#hamburger.icono-hamburger', {
-                style: {
-                    transform: 'scale(1.3, 1.3)',
-                    'margin-left': '10px',
-                    'margin-top': '17px'
-                }
-            })),
-            m('div#menu', {
-                    class: !app.mobileMenu && ['hideMobile'],
-                },
-                m('div.pure-menu', [
-                    m('span.pure-menu-heading', 'Michael Shoemate'),
-                    m('ul.pure-menu-list', [
-                        app.projects.map((project) => m('li.pure-menu-item',
-                            m('a.pure-menu-link', {onclick: () => selectProject(project.id)}, project.name)))
-                    ])
-                ])
-            ),
-            m('div#canvas',
-                m('div#content', app.projects.map((project) => m(Card, project)))
-            )
-        ]
+        return m(Layout, {
+            panel: app.projects.map((project) => m('li.pure-menu-item', m('a.pure-menu-link',
+                {onclick: () => selectCard('', project.id)},
+                project.name
+            ))),
+            main: app.projects.map((project) => m(Card, Object.assign(
+                {attrsAll: {onclick: () => m.route.set("/" + project.id)}},
+                project
+            )))
+        })
     }
 }
-
-export let selectProject = (project) => {
-    if (app.projects.map((desc) => desc.id).indexOf(project) === -1) {
-        m.route.set('/');
-        return;
-    }
-
-    if (app.mobileMenu) app.toggleMobileMenu();
-    document.getElementById('card' + project).scrollIntoView();
-    document.getElementById('canvas').scrollTop -= 10;
-    m.route.set("/" + project);
-};
 
 class Simulator {
+    oncreate(vnode) {
+        let {stage} = vnode.attrs;
+        if (stage) selectCard(stage);
+    }
 
     view(vnode) {
-        return [
-            m('a.menu-link', {href: '#menu'}, m('span')),
-            m('div#menu',
-                m('div.pure-menu', {display: 'inline-block'}, [
-                    m('span.pure-menu-heading', 'Michael Shoemate'),
-                    m('ul.pure-menu-list', [
-                        Object.keys(sim.validHyperparameters).map((param) => m('li.pure-menu-item',
-                            m('a.pure-menu-link', param)))
-                    ])
-                ])
-            ),
-            m('div#canvas',
-                m('div#content', sim.views.map((project) => m(Card, project)))
-            )
-        ]
+        return m(Layout, {
+            panel: sim.views.map((view) => m('li.pure-menu-item', m('a.pure-menu-link',
+                {onclick: () => selectCard('simulator/', view.id)},
+                view.name
+            ))),
+            main: sim.views.map((view) => m(Card, view))
+        })
     }
 }
+
+export let selectCard = (path, card) => {
+    try {
+        if (app.mobileMenu) app.toggleMobileMenu();
+        document.getElementById('card' + card).scrollIntoView();
+        document.getElementById('canvas').scrollTop -= 10;
+        m.route.set("/" + path + card);
+    } catch (err) {
+        m.route.set('/' + path);
+    }
+
+};
 
 m.route.prefix("");
 m.route(document.body, "/", {
     "/": Home,
     "/simulator": Simulator,
+    "/simulator/:stage": Simulator,
     "/:project": Home
 });
