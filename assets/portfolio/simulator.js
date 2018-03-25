@@ -26,14 +26,14 @@ let getNetwork = () => {
 };
 
 
-let getSettings = () => Object.keys(optimizerType).map((setting) => {
+let getSettings = (range, type) => Object.keys(type).map((setting) => {
     let interaction;
 
-    if (optimizerType[setting] === 'dropdown') interaction = m(`select#dropdown${setting}`, {
+    if (type[setting] === 'dropdown') interaction = m(`select#dropdown${setting}`, {
             value: 'Select Basis',
             onchange: m.withAttr('value', (value) => setUserHyperparameter(setting, value))
         },
-        optimizerRange[setting].map((option) => m('option', option)));
+        range[setting].map((option) => m('option', option)));
 
     else interaction = m('input#input' + setting.replace(/ /g, "_"), {
             type: 'text',
@@ -52,7 +52,7 @@ export let addLayer = (layer, field, value) => layers.push({[field]: value});
 export let setLayer = (layer, field, value) => layers[layer][field] = value;
 export let delLayer = (layer) => layers.splice(layer);
 
-// network parameters
+// acceptable network parameters
 export let networkRange = {
     'units': [1, 200],
     'layers': [1, 10],
@@ -61,10 +61,24 @@ export let networkRange = {
         'tanh', 'arctan', 'sinusoid', 'sinc', 'softsign', 'bent', 'log'
     ],
     'distribute': ['normal', 'uniform'],
+
+    'normalize': [true, false],
+    'normalize decay': [0, 100],
+};
+
+// types of input for network fields
+export let networkType = {
+    'units': 'integer',
+    'layers': 'integer',
+    'basis': 'dropdown',
+    'distribute': 'dropdown',
+
+    'normalize': 'dropdown',
+    'normalize decay': 'real',
 };
 
 
-// optimizer parameters
+// acceptable optimizer parameters
 export let optimizerRange = {
     'optimizer': [
         'GradientDescent', 'Momentum', 'Nesterov', 'Adagrad',
@@ -79,12 +93,28 @@ export let optimizerRange = {
     'learn anneal': ['fixed', 'linear', 'inverse', 'power', 'exp'],
     'learn decay': [-100, 100],
 
-    'normalize': [true, false],
-    'normalize decay': [0, 100],
-
     'batch norm step': [0, 100],
     'batch norm decay': [0, 1],
+};
 
+// types of input for optimizer fields
+export let optimizerType = {
+    'optimizer': 'dropdown',
+    'iteration limit': 'integer',
+
+    'cost': 'dropdown',
+    'batch size': 'integer',
+
+    'learn step': 'real',
+    'learn anneal': 'dropdown',
+    'learn decay': 'real',
+
+    'batch norm step': 'real',
+    'batch norm decay': 'real',
+};
+
+// acceptable inputs for regularizers
+export let regularizerRange = {
     'regularize step': [0, 100],
     'regularizer': ['none', 'L1', 'L2', 'L12'],
 
@@ -102,32 +132,8 @@ export let optimizerRange = {
     'noise decay': [-100, 100]
 };
 
-// network parameters
-export let networkType = {
-    'units': 'integer',
-    'layers': 'integer',
-    'basis': 'dropdown',
-    'distribute': 'dropdown'
-};
-
-// optimizer parameters
-export let optimizerType = {
-    'optimizer': 'dropdown',
-    'iteration limit': 'integer',
-
-    'cost': 'dropdown',
-    'batch size': 'integer',
-
-    'learn step': 'real',
-    'learn anneal': 'dropdown',
-    'learn decay': 'real',
-
-    'normalize': 'dropdown',
-    'normalize decay': 'real',
-
-    'batch norm step': 'real',
-    'batch norm decay': 'real',
-
+// types of input for regularizer fields
+export let regularizerType = {
     'regularize step': 'real',
     'regularizer': 'dropdown',
 
@@ -209,7 +215,13 @@ export let views = [
     {
         id: 'Optimizer',
         name: 'Optimizer',
-        description: m('#settingsForm.pure-form.pure-form-aligned', m('fieldset', getSettings())),
+        description: m('#settingsForm.pure-form.pure-form-aligned', m('fieldset', getSettings(optimizerRange, optimizerType))),
+        links: []
+    },
+    {
+        id: 'Regularizers',
+        name: 'Regularizers',
+        description: m('#settingsForm.pure-form.pure-form-aligned', m('fieldset', getSettings(regularizerRange, regularizerType))),
         links: []
     },
     {
