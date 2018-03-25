@@ -33,7 +33,7 @@ body, html {
 }
 
 #content {
-    padding: 0 2em;
+    padding: 0 1em;
     margin: 0 auto;
     max-width: 80em;
 }
@@ -62,10 +62,6 @@ body, html {
 }
 
 @media (max-width: 1000px) {
-    #canvas {
-        padding-left: 2em;
-        padding-right: 2em;
-    }
 
     #menu {
         display: none;
