@@ -1,4 +1,6 @@
 import '../../node_modules/purecss/build/pure-min.css'
+import '../../node_modules/icono/build/icono.css'
+
 import m from 'mithril'
 import "./index.css"
 import Card from './views/Card'
@@ -15,9 +17,17 @@ class Home {
 
     view(vnode) {
         return [
-            m('a.menu-link', {href: '#menu'}, m('span')),
-            m('div#menu',
-                m('div.pure-menu', {display: 'inline-block'}, [
+            m('a#menuTab.menu-link', {onclick: app.toggleMobileMenu}, m('#hamburger.icono-hamburger', {
+                style: {
+                    transform: 'scale(1.3, 1.3)',
+                    'margin-left': '10px',
+                    'margin-top': '17px'
+                }
+            })),
+            m('div#menu', {
+                    class: !app.mobileMenu && ['hideMobile'],
+                },
+                m('div.pure-menu', [
                     m('span.pure-menu-heading', 'Michael Shoemate'),
                     m('ul.pure-menu-list', [
                         app.projects.map((project) => m('li.pure-menu-item',
@@ -33,8 +43,12 @@ class Home {
 }
 
 export let selectProject = (project) => {
-    if (app.projects.map((desc) => desc.id).indexOf(project) === -1) { m.route.set('/'); return; }
+    if (app.projects.map((desc) => desc.id).indexOf(project) === -1) {
+        m.route.set('/');
+        return;
+    }
 
+    if (app.mobileMenu) app.toggleMobileMenu();
     document.getElementById('card' + project).scrollIntoView();
     document.getElementById('canvas').scrollTop -= 10;
     m.route.set("/" + project);

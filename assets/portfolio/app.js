@@ -1,5 +1,3 @@
-import m from "mithril";
-
 export let colBackground = '#f2f3ec';
 export let colGray = '#EDEDF0';
 export let colGray2 = '#CACAD3';
@@ -8,6 +6,9 @@ export let colAccent = '#3E7D9B';
 export let colAccent2 = '#3E9B5B';
 
 export let colAccentLight = '#A8CBDC';
+
+export let mobileMenu = false;
+export let toggleMobileMenu = () => mobileMenu = !mobileMenu;
 
 export let projects = [
     {
