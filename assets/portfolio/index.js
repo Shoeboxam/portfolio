@@ -12,7 +12,7 @@ import * as sim from './simulator'
 class Home {
     oncreate(vnode) {
         let {project} = vnode.attrs;
-        if (project) selectCard(project);
+        if (project) selectCard('', project);
     }
 
     view(vnode) {
@@ -32,7 +32,7 @@ class Home {
 class Simulator {
     oncreate(vnode) {
         let {stage} = vnode.attrs;
-        if (stage) selectCard(stage);
+        if (stage) selectCard('simulator/', stage);
     }
 
     view(vnode) {
@@ -53,9 +53,8 @@ export let selectCard = (path, card) => {
         document.getElementById('canvas').scrollTop -= 10;
         m.route.set("/" + path + card);
     } catch (err) {
-        m.route.set('/' + path);
+        m.route.set('/');
     }
-
 };
 
 m.route.prefix("");

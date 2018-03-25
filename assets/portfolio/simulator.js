@@ -29,18 +29,28 @@ let getNetwork = () => {
 let getSettings = (range, type) => Object.keys(type).map((setting) => {
     let interaction;
 
-    if (type[setting] === 'dropdown') interaction = m(`select#dropdown${setting}`, {
+    if (type[setting] === 'dropdown') interaction = m(`select#input${setting}`, {
+            style: {float: 'right', width: '50%'},
             value: 'Select Basis',
             onchange: m.withAttr('value', (value) => setUserHyperparameter(setting, value))
         },
         range[setting].map((option) => m('option', option)));
 
     else interaction = m('input#input' + setting.replace(/ /g, "_"), {
-            type: 'text',
-            onblur: m.withAttr('value', (value) => setUserHyperparameter(setting, value))
-        });
+        style: {float: 'right', width: '50%'},
+        type: 'text',
+        onblur: m.withAttr('value', (value) => setUserHyperparameter(setting, value))
+    });
 
-    return [m(`#label${setting.replace(/ /g, "_")}`, setting), interaction]
+    return m('div.pure-control-group', {style: {display: 'inline'}}, [
+        m('div', {style: {width: '50%', float: 'left'}}, [
+            m('div', {style: {float: 'left', width: '47%', display: 'inline', 'margin-right': '3%'}}, m(`#label${setting.replace(/ /g, "_")}`, {
+                style: {float: 'right'},
+                for: 'input' + setting.replace(/ /g, "_")
+            }, setting)),
+            interaction
+        ])
+    ])
 });
 
 export let problem = '';
@@ -209,19 +219,22 @@ export let views = [
     {
         id: 'Network',
         name: 'Network',
-        description: m('#settingsForm.pure-form.pure-form-aligned', m('fieldset', getNetwork())),
+        description: m('form#settingsForm.pure-form.pure-form-aligned',
+            m('fieldset', getNetwork())),
         links: []
     },
     {
         id: 'Optimizer',
         name: 'Optimizer',
-        description: m('#settingsForm.pure-form.pure-form-aligned', m('fieldset', getSettings(optimizerRange, optimizerType))),
+        description: m('form#settingsForm.pure-form.pure-form-aligned',
+            m('fieldset', getSettings(optimizerRange, optimizerType))),
         links: []
     },
     {
         id: 'Regularizers',
         name: 'Regularizers',
-        description: m('#settingsForm.pure-form.pure-form-aligned', m('fieldset', getSettings(regularizerRange, regularizerType))),
+        description: m('form#settingsForm.pure-form.pure-form-aligned',
+            m('fieldset', getSettings(regularizerRange, regularizerType))),
         links: []
     },
     {

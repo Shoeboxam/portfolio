@@ -23,5 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('update/', views.update, name='update'),
     path('', views.index, name='index'),
-    path('<url>', views.index, name='index')
+    path('<url>', views.index, name='index'),
+    path('<url>/<suburl>', views.index, name='index')
 ]
