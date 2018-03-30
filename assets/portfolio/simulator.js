@@ -1,66 +1,14 @@
 import m from 'mithril'
 
-let getNetwork = () => {
-    let menu = layers.map((layer, i) => [
-        m('label', {for: 'layer' + i}, 'Layer ' + i),
-        m('select#layer' + i, {
-                value: layer['transform'],
-                onchange: m.withAttr('value', (value) => setLayer(i, 'transform', value))
-            },
-            networkRange['basis'].map((transform) => m('option', transform))),
-        m('input#layer' + i, {type: 'text', onblur: m.withAttr('value', (value) => setLayer(i, 'nodes', value))})
-    ]);
-
-    if (menu.length < 10) {
-        menu.push([
-            m('label', {for: 'newLayer'}, 'New'),
-            m('select#newLayer', {
-                    value: 'Select Basis',
-                    onchange: m.withAttr('value', (value) => addLayer(layers.length, 'transform', value))
-                },
-                networkRange['basis'].map((transform) => m('option', transform))),
-            m('input#newLayer', {type: 'text'})
-        ])
-    }
-    return menu;
+// ~~~~~ declare menu content first ~~~~~
+let vecFunctions = {
+    'x^2': 'Function description 1',
+    '3*x^3 + 23': 'Function description 2'
 };
-
-
-let getSettings = (range, type) => Object.keys(type).map((setting) => {
-    let interaction;
-
-    if (type[setting] === 'dropdown') interaction = m(`select#input${setting}`, {
-            style: {float: 'right', width: '50%'},
-            value: 'Select Basis',
-            onchange: m.withAttr('value', (value) => setUserHyperparameter(setting, value))
-        },
-        range[setting].map((option) => m('option', option)));
-
-    else interaction = m('input#input' + setting.replace(/ /g, "_"), {
-        style: {float: 'right', width: '50%'},
-        type: 'text',
-        onblur: m.withAttr('value', (value) => setUserHyperparameter(setting, value))
-    });
-
-    return m('div.pure-control-group', {style: {display: 'inline'}}, [
-        m('div', {style: {width: '50%', float: 'left'}}, [
-            m('div', {style: {float: 'left', width: '47%', display: 'inline', 'margin-right': '3%'}}, m(`#label${setting.replace(/ /g, "_")}`, {
-                style: {float: 'right'},
-                for: 'input' + setting.replace(/ /g, "_")
-            }, setting)),
-            interaction
-        ])
-    ])
-});
-
-export let problem = '';
-export let setProblem = (prob) => problem = prob;
-
-export let layers = [];
-
-export let addLayer = (layer, field, value) => layers.push({[field]: value});
-export let setLayer = (layer, field, value) => layers[layer][field] = value;
-export let delLayer = (layer) => layers.splice(layer);
+let logicGates = {
+    'XOR': 'XOR is an example of a non-linearly separable problem.',
+    'combination': 'Logic gate desc 2',
+};
 
 // acceptable network parameters
 export let networkRange = {
@@ -162,9 +110,10 @@ export let regularizerType = {
 };
 
 export let defaultHyperparameters = {
-    'function': {
-        'units': [10],
-        'basis': ['bent', 'bent'],
+    'vector function': {
+        'network': [
+            {'units': 10, 'basis': 'bent'}
+        ],
         'distribute': 'normal',
 
         'optimizer': 'Adagrad',
@@ -178,8 +127,10 @@ export let defaultHyperparameters = {
         'debug frequency': 10
     },
     'logic gate': {
-        'units': [20, 10],
-        'basis': ['bent', 'bent', 'logistic'],
+        'network': [
+            {'units': 10, 'basis': 'bent'},
+            {'units': 20, 'basis': 'logistic'}
+        ],
         'distribute': 'uniform',
 
         'optimizer': 'GradientDescent',
@@ -189,10 +140,11 @@ export let defaultHyperparameters = {
         'learn step': .001,
         'noise variance': 1
     },
-    'autoencoder': {
+    'figlet autoencoder': {
+        'network': [
+            {'units': 100, 'basis': 'bent'}
+        ],
         'iteration limit': 10000,
-        'units': [100],
-        'basis': ['bent', 'logistic'],
         'distribute': 'normal',
 
         'optimizer': 'Adagrad',
@@ -203,44 +155,197 @@ export let defaultHyperparameters = {
     }
 };
 
-let userHyperparameters = {};
-let setUserHyperparameter = (setting, preference) => userHyperparameters[setting] = preference;
+// ~~~~ build menus ~~~~
+
+let problemMenu = () => m('div.pure-form.pure-g-r',
+    m('div.pure-u-1-2',
+        m('div.pure-g-r',
+            m('div.pure-u-1-2', {style: {'text-align': 'right'}}, m('label', {for: 'problemSelect', style: {'margin-right': '1em'}}, 'Problem Type ')),
+            m('select.pure-u-1-2#problemType', {
+                    value: currentProblem,
+                    onchange: m.withAttr('value', (value) => setCurrentProblem(value))
+                },
+                Object.keys(problemConfigurations).map((prob) => m('option', prob))
+            )
+        ),
+        m('div.pure-u-1', problemConfigurations[currentProblem].description)
+    ),
+    m('div.pure-u-1-2#problemFocusMenu', problemConfigurations[currentProblem].content())
+);
+
+export let currentProblem = 'vector function';
+export let setCurrentProblem = (prob) => {
+    currentProblem = prob;
+    setCurrentConfiguration();
+};
+
+export let currentConfiguration = {
+    'vector function': 'x^2',
+    'logic gate': 'XOR',
+    'figlet autoencoder': 'default'
+};
+export let setCurrentConfiguration = (config) => {
+    if (config === undefined) config = currentConfiguration[currentProblem];
+    else currentConfiguration[currentProblem] = config;
+
+    if (userSettings[currentProblem] === undefined) userSettings[currentProblem] = {};
+    if (userSettings[currentProblem][config] === undefined) userSettings[currentProblem][config] = {};
+    if (userSettings[currentProblem][config]['network'] === undefined) {
+        userSettings[currentProblem][config]['network'] = defaultHyperparameters[currentProblem]['network'];
+    }
+};
+
+let problemConfigurations = {
+    'vector function': {
+        description: 'Fit a vector function',
+        content: () => m('div.pure-g-r',
+            m('div.pure-u-1-2', {style: {'text-align': 'right'}}, m('label', {for: 'functionSelect', style: {'margin-right': '1em'}}, 'Select Function')),
+            m('select.pure-u-1-2#functionSelect', {
+                    onchange: m.withAttr('value', (value) => setCurrentConfiguration(value))
+                },
+                Object.keys(vecFunctions).map((prob) =>
+                    m('option', currentConfiguration[currentProblem] === prob && {selected: 'selected'}, prob))
+            ),
+            m('div.pure-u-1', vecFunctions[currentConfiguration[currentProblem]])
+        )
+    },
+    'logic gate': {
+        description: 'Emulate a logic gate.',
+        content: () => m('div.pure-g-r',
+            m('div.pure-u-1-2', {style: {'text-align': 'right'}}, m('label', {for: 'logicSelect', style: {'margin-right': '1em'}}, 'Select Gate')),
+            m('select.pure-u-1-2#logicSelect', {
+                    onchange: m.withAttr('value', (value) => setCurrentConfiguration(value))
+                },
+                Object.keys(logicGates).map((gate) =>
+                    m('option', currentConfiguration[currentProblem] === gate && {selected: 'selected'}, gate))
+            ),
+            m('div.pure-u-1', logicGates[currentConfiguration[currentProblem]])
+        )
+    },
+    'figlet autoencoder': {
+        description: 'Denoise a figlet font.',
+        content: () => m('div', 'FIGLET STUFF')
+    }
+};
+
+let networkMenu = () => {
+    let config = userSettings[currentProblem][currentConfiguration[currentProblem]];
+
+    let menu = config['network'].map((layer, i) => m('div.pure-form.pure-g-r',
+        m('div#addLayer.pure-button.icono-cross', {
+            style: {color: 'gray'},
+            onclick: (e) => {e.stopPropagation(); delLayer(i)}
+        }),
+        m('div.pure-u-1-5', m(`#labelLayer${i}`, {
+            style: {'text-align': 'right', 'margin-right': '1em'},
+            for: layer + i
+        }, 'Layer ' + i)),
+        m('select.pure-u-1-5#layer' + i, {
+                value: layer['basis'],
+                onchange: m.withAttr('value', (value) => setLayer(i, 'basis', value))
+            },
+            networkRange['basis'].map((basis) => m('option',
+                m('option', config['network'][i]['basis'] === basis && {selected: 'selected'}, basis)))),
+        m('input.pure-u-1-5#layer' + i, {
+            type: 'text',
+            value: config['network'][i]['units'],
+            onblur: m.withAttr('value', (value) => setLayer(i, 'units', value))})
+    ));
+
+    if (menu.length < 10) {
+        menu.push(m('div#addLayer.pure-button.icono-plus', {
+            style: {color: 'gray'},
+            onclick: addLayer
+        }))
+    }
+    return menu;
+};
+
+export let addLayer = () => {
+    let config = userSettings[currentProblem][currentConfiguration[currentProblem]];
+    config['network'].push({
+        units: 20,
+        basis: 'bent'
+    });
+};
+export let setLayer = (layer, field, value) => {
+    let config = userSettings[currentProblem][currentConfiguration[currentProblem]];
+    config['network'][layer][field] = value;
+};
+export let delLayer = (layer) => {
+    let config = userSettings[currentProblem][currentConfiguration[currentProblem]];
+    config['network'].splice(layer, 1);
+};
+
+
+let getForm = (range, type, field) => {
+    let interaction;
+
+    if (type[field] === 'dropdown') interaction = m(`select.pure-u-1-2#input${field}`, {
+            style: {float: 'right', width: '50%'},
+            onchange: m.withAttr('value', (param) => setUserSetting(field, param))
+        },
+        range[field].map((option) => m('option', getUserSetting(field) === option && {selected: 'selected'},  option)));
+
+    else interaction = m('input.pure-u-1-2#input' + field.replace(/ /g, "_"), {
+        style: {float: 'right', width: '50%'},
+        type: 'text',
+        value: getUserSetting(field),
+        onblur: m.withAttr('value', (param) => setUserSetting(field, param))
+    });
+
+    return m('div.pure-u-1-2.pure-control-group', [
+        m('div.pure-g-r', [
+            m('div.pure-u-1-2', m(`#label${field.replace(/ /g, "_")}`, {
+                style: {'text-align': 'right', 'margin-right': '1em'},
+                for: 'input' + field.replace(/ /g, "_")
+            }, field)),
+            interaction
+        ])
+    ])
+};
+
+// stores settings per problem configuration
+export let userSettings = {};
+export let setUserSetting = (field, value) => {
+    userSettings[currentProblem][currentConfiguration[currentProblem]][field] = value;
+};
+export let getUserSetting = (field) => {
+    let currentConfig = currentConfiguration[currentProblem];
+    return (((userSettings[currentProblem] || {})[currentConfig] || {})[field]) || (defaultHyperparameters[currentProblem] || {})[field];
+};
+
+// ensure settings are properly initialized on page load
+setCurrentConfiguration(currentConfiguration[currentProblem]);
 
 export let views = [
     {
         id: 'Problem',
         name: 'Problem',
-        description:
-        'Vector function: Fit a vector function.<br>' +
-        'Logic Gate: Emulate a logic gate. XOR is widely used as an example of a non-linearly separable problem.<br>' +
-        'Autoencoder: Denoise a figlet font.<br>',
-        links: []
+        children: problemMenu
     },
     {
         id: 'Network',
         name: 'Network',
-        description: m('form#settingsForm.pure-form.pure-form-aligned',
-            m('fieldset', getNetwork())),
-        links: []
+        children: networkMenu
     },
     {
         id: 'Optimizer',
         name: 'Optimizer',
-        description: m('form#settingsForm.pure-form.pure-form-aligned',
-            m('fieldset', getSettings(optimizerRange, optimizerType))),
-        links: []
+        children: () => m('form#settingsForm.pure-form.pure-form-aligned',
+            m('fieldset.pure-g-r', Object.keys(optimizerRange)
+                .map((key) => getForm(optimizerRange, optimizerType, key)))),
     },
     {
         id: 'Regularizers',
         name: 'Regularizers',
-        description: m('form#settingsForm.pure-form.pure-form-aligned',
-            m('fieldset', getSettings(regularizerRange, regularizerType))),
-        links: []
+        children: () => m('form#settingsForm.pure-form.pure-form-aligned',
+            m('fieldset.pure-g-r', Object.keys(regularizerRange)
+                .map((key) => getForm(regularizerRange, regularizerType, key)))),
     },
     {
         id: 'View',
         name: 'View',
-        description: 'PLOTS',
-        links: []
+        children: () => 'PLOTS'
     }
 ];

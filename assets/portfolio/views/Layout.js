@@ -17,7 +17,9 @@ export default class Layout {
                     class: !app.mobileMenu && ['hideMobile'],
                 },
                 m('div.pure-menu', [
-                    m('span.pure-menu-heading', 'Michael Shoemate'),
+                    m('span.pure-menu-heading', {
+                        onclick: () => m.route.set('/')
+                    }, 'Michael Shoemate'),
                     m('ul.pure-menu-list', panel)
                 ])
             ),

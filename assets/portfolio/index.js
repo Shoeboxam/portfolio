@@ -1,4 +1,5 @@
 import '../../node_modules/purecss/build/pure-min.css'
+import '../../node_modules/purecss/build/grids-responsive-min.css'
 import '../../node_modules/icono/build/icono.css'
 
 import m from 'mithril'
@@ -21,10 +22,7 @@ class Home {
                 {onclick: () => selectCard('', project.id)},
                 project.name
             ))),
-            main: app.projects.map((project) => m(Card, Object.assign(
-                {attrsAll: {onclick: () => m.route.set("/" + project.id)}},
-                project
-            )))
+            main: app.projects.map((project) => m(Card, project, project.children()))
         })
     }
 }
@@ -41,7 +39,7 @@ class Simulator {
                 {onclick: () => selectCard('simulator/', view.id)},
                 view.name
             ))),
-            main: sim.views.map((view) => m(Card, view))
+            main: sim.views.map((view) => m(Card, view, view.children()))
         })
     }
 }
