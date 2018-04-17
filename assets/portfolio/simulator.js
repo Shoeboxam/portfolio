@@ -160,7 +160,10 @@ export let defaultHyperparameters = {
 let problemMenu = () => m('div.pure-form.pure-g-r',
     m('div.pure-u-1-2',
         m('div.pure-g-r',
-            m('div.pure-u-1-2', {style: {'text-align': 'right'}}, m('label', {for: 'problemSelect', style: {'margin-right': '1em'}}, 'Problem Type ')),
+            m('div.pure-u-1-2', {style: {'text-align': 'right'}}, m('label', {
+                for: 'problemSelect',
+                style: {'margin-right': '1em'}
+            }, 'Problem Type ')),
             m('select.pure-u-1-2#problemType', {
                     value: currentProblem,
                     onchange: m.withAttr('value', (value) => setCurrentProblem(value))
@@ -199,7 +202,10 @@ let problemConfigurations = {
     'vector function': {
         description: 'Fit a vector function',
         content: () => m('div.pure-g-r',
-            m('div.pure-u-1-2', {style: {'text-align': 'right'}}, m('label', {for: 'functionSelect', style: {'margin-right': '1em'}}, 'Select Function')),
+            m('div.pure-u-1-2', {style: {'text-align': 'right'}}, m('label', {
+                for: 'functionSelect',
+                style: {'margin-right': '1em'}
+            }, 'Select Function')),
             m('select.pure-u-1-2#functionSelect', {
                     onchange: m.withAttr('value', (value) => setCurrentConfiguration(value))
                 },
@@ -212,7 +218,10 @@ let problemConfigurations = {
     'logic gate': {
         description: 'Emulate a logic gate.',
         content: () => m('div.pure-g-r',
-            m('div.pure-u-1-2', {style: {'text-align': 'right'}}, m('label', {for: 'logicSelect', style: {'margin-right': '1em'}}, 'Select Gate')),
+            m('div.pure-u-1-2', {style: {'text-align': 'right'}}, m('label', {
+                for: 'logicSelect',
+                style: {'margin-right': '1em'}
+            }, 'Select Gate')),
             m('select.pure-u-1-2#logicSelect', {
                     onchange: m.withAttr('value', (value) => setCurrentConfiguration(value))
                 },
@@ -234,7 +243,10 @@ let networkMenu = () => {
     let menu = config['network'].map((layer, i) => m('div.pure-form.pure-g-r',
         m('div#addLayer.pure-button.icono-cross', {
             style: {color: 'gray'},
-            onclick: (e) => {e.stopPropagation(); delLayer(i)}
+            onclick: (e) => {
+                e.stopPropagation();
+                delLayer(i)
+            }
         }),
         m('div.pure-u-1-5', m(`#labelLayer${i}`, {
             style: {'text-align': 'right', 'margin-right': '1em'},
@@ -249,7 +261,8 @@ let networkMenu = () => {
         m('input.pure-u-1-5#layer' + i, {
             type: 'text',
             value: config['network'][i]['units'],
-            onblur: m.withAttr('value', (value) => setLayer(i, 'units', value))})
+            onblur: m.withAttr('value', (value) => setLayer(i, 'units', value))
+        })
     ));
 
     if (menu.length < 10) {
@@ -285,7 +298,7 @@ let getForm = (range, type, field) => {
             style: {float: 'right', width: '50%'},
             onchange: m.withAttr('value', (param) => setUserSetting(field, param))
         },
-        range[field].map((option) => m('option', getUserSetting(field) === option && {selected: 'selected'},  option)));
+        range[field].map((option) => m('option', getUserSetting(field) === option && {selected: 'selected'}, option)));
 
     else interaction = m('input.pure-u-1-2#input' + field.replace(/ /g, "_"), {
         style: {float: 'right', width: '50%'},
@@ -344,8 +357,51 @@ export let views = [
                 .map((key) => getForm(regularizerRange, regularizerType, key)))),
     },
     {
-        id: 'View',
-        name: 'View',
-        children: () => 'PLOTS'
+        id: 'Train',
+        name: 'Train',
+        children: () => m('button.pure-button', {
+            onclick: trainNetwork
+        }, 'Train')
     }
 ];
+
+let sessionID;
+let plotError = [];
+
+let trainNetwork = () => {
+
+    let defaultNetwork = defaultHyperparameters[currentProblem];
+    let userNetwork = userSettings[currentProblem][currentConfiguration[currentProblem]];
+    let post = Object.assign({},
+        defaultNetwork,
+        userNetwork,
+        {
+            problem: currentProblem,
+            configuration: currentConfiguration[currentProblem],
+        });
+
+    m.request({
+        method: 'POST',
+        url: '/api/enqueue',
+        data: post
+    }).then((json) => {
+        sessionID = json['sessionID'];
+        dataLoop();
+    })
+};
+
+let dataLoop = () => {
+
+    m.request({
+        method: 'POST',
+        url: '/api/optimizer',
+        data: {sessionID: sessionID}
+    }).then((json) => {
+        for (let point of json['data']) {
+            plotError.splice(point['error'], 0, point['time']);
+        }
+        if (json['end'] === true) return;
+        dataLoop();
+    });
+
+};
