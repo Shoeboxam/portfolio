@@ -1,6 +1,6 @@
 import '../../node_modules/purecss/build/pure-min.css'
 import '../../node_modules/purecss/build/grids-responsive-min.css'
-import '../../node_modules/icono/build/icono.css'
+import '../../node_modules/icono/dist/icono.min.css'
 
 import m from 'mithril'
 import "./index.css"
