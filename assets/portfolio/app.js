@@ -276,5 +276,20 @@ export let projects = [
                 onclick: () => location.href = 'https://github.com/Shoeboxam/GLSL_Shaders'
             }
         ]
+    },
+    {
+        id: 'Meta_Portfolio',
+        name: 'Meta Portfolio',
+        children: () => m.trust(
+            'This website is hosted on a DigitalOcean droplet, served by Apache via WSGI through Django. ' +
+            `The assets are packaged by webpack, and the HTML is built with Mithril. That's a lot of overhead, Mike! ` +
+            `I have aspirations for a running some live/dynamic network visualizations through this site, but they aren't ready yet. `
+        ),
+        links: [
+            {
+                name: 'Repository',
+                onclick: () => location.href = 'https://github.com/Shoeboxam/portfolio'
+            }
+        ]
     }
 ];
