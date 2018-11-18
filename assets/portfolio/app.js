@@ -17,9 +17,9 @@ export let projects = [
         id: 'TwoRavens',
         name: 'TwoRavens',
         children: () => m.trust(
-            'I work for the research organization TwoRavens, developing tools for visualizing data and conducting statistical analysis. ' +
+            `I work for a research organization 'TwoRavens' developing tools for visualizing data and conducting statistical analysis. ` +
             'My work has been spread over several different projects: the core project, metadata service, and EventData. ' +
-            `I also built a collection of reusable, modular UI components called 'common' for rapid and homogenous front-end development in Mithril. `),
+            `I also built a collection of reusable modular UI components I've named 'common' for rapid and homogenous front-end development in Mithril. `),
         links: [
             {
                 name: 'Website',
@@ -40,8 +40,8 @@ export let projects = [
         ]
     },
     {
-        id: 'TwoRavens_EventData',
-        name: 'TwoRavens EventData',
+        id: 'TwoRavens_Event_Data',
+        name: 'TwoRavens Event Data',
         children: () => m.trust(
             'One of my major projects at TwoRavens was developing tool for analyzing event data. ' +
             `The front-end uses UI state to construct database queries that are run against a Mongo database. ` +
@@ -49,7 +49,7 @@ export let projects = [
             'This tool is a part of the broader linked repository.'),
         links: [
             {
-                name: 'EventData',
+                name: 'Website',
                 onclick: () => location.href = 'http://eventdata.2ravens.org'
             },
             {
@@ -121,7 +121,7 @@ export let projects = [
     },
     {
         id: 'Applied_Mathematics',
-        name: 'Applied Mathematics Collection',
+        name: 'Applied Mathematics',
         children: () => m.trust(
             'This is a collection of concrete implementations of abstract mathematical concepts, and machine learning model implementations using Numpy or common ML libraries. ' +
             'For example, one script demonstrates how to coax Tensorflow into computing a global hessian (instead of just the block diagonal matrices). ' +
@@ -242,12 +242,17 @@ export let projects = [
         id: 'Miscellaneous',
         name: 'Miscellaneous',
         children: () => m.trust(
-            `There's too much Python, so here's some work I did in other languages. `,
+            `There's too much Python! Here's some work I did in other languages. ` +
+            '<br><br>' +
             'I wrote an android app for location-based chat rooms. ' +
             'The app is written in Java, and the backend is a flask server with user data managed in mySql. ' +
+            '<br>' +
             'I thought it would be fun to write a Minecraft Java modification that implements git version control commands in the Minecraft chat box. ' +
+            '<br>' +
             'There is a website called data.gov that acts as a portal for government-hosted datasets. I wanted a way to quickly download datasets from the command-line, so I wrote a small client in C# that uses their REST API. ' +
+            '<br>' +
             'I wrote a console-based Othello board game in Java, with multiplayer and AIs. ' +
+            '<br>' +
             'I also got interested in graphics programming, so I wrote a collection of GLSL shaders. '),
         links: [
             {
